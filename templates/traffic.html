@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <title>流量</title>
+    <!-- including ECharts file -->
+    <script type="text/javascript" src="https://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body style="height: 100%; margin: 0">
+<!-- prepare a DOM container with width and height -->
+<div id="main" style="height:100%;"></div>
+<script type="text/javascript">
+    function humanReadableSize(bytes) {
+        let unit = 1024;
+        if (bytes < unit) {
+            return bytes + " B";
+        }
+        let exp = parseInt(Math.log(bytes) / Math.log(unit));
+        pre = "KMGTPE".charAt(exp - 1) + "i";
+        return (bytes / Math.pow(unit, exp)).toFixed(2) + " " + pre + "B";
+    }
+
+    // based on prepared DOM, initialize echarts instance
+    const myChart = echarts.init(document.getElementById('main'));
+
+    // specify chart configuration item and data
+    const option = {
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (params) {
+                let result = "";
+                for (let i = 0; i < params.length; i++) {
+                    result += params[i].seriesName + ": " + humanReadableSize(params[i].value) + "<br/>";
+                }
+                result += "(" + params[0].axisValue.replace(/\.\d{5,}/,'') + ")";
+                return result;
+            }
+        },
+        legend: {
+            data: []
+        },
+        xAxis: {
+            type: 'category',
+            axisLabel: {
+                formatter: function (params) {
+                    return params.replace(/\.\d{5,}/,'');
+                }
+            },
+            data: []
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: function (params) {
+                    return humanReadableSize(params);
+                }
+            }
+        },
+        series: []
+    };
+
+    $(function () {
+        $.ajax({
+            url: '{{.data_api}}',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function (chart_values) {
+                let map = {};
+                for (let i = 0; i < chart_values.length; i++) {
+                    let key = chart_values[i]['name'] + chart_values[i]['type'];
+                    if (!(key in map)) {
+                        map[key] = option.series.length;
+                        let tmp = chart_values[i]['name'];
+                        option.series.push({
+                            data: [],
+                            stack: '流量',
+                            name: tmp,
+                            type: 'line'
+                        });
+                        option.legend.data.push(tmp);
+                    }
+                    let c = map[key];
+                    if (i % 2 === 0) {
+                        option.xAxis.data.push(chart_values[i]['date']);
+                    }
+                    option.series[c].data.push(chart_values[i]['value']);
+                }
+                myChart.setOption(option);
+            }
+        });
+    });
+
+    // use configuration item and data specified to show chart
+</script>
+</body>
+</html>

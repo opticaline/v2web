@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+</head>
+<body>
+{{range .users }}
+    <!--Create the link for the article based on its ID-->
+    <a href="/view/traffic/user/{{.}}">
+        <!--Display the title of the article -->
+        <h2>{{.}}</h2>
+    </a>
+{{end}}
+</body>
+</html>
