@@ -33,7 +33,7 @@
                 for (let i = 0; i < params.length; i++) {
                     result += params[i].seriesName + ": " + humanReadableSize(params[i].value) + "<br/>";
                 }
-                result += "(" + params[0].axisValue.replace(/\.\d{5,}/,'') + ")";
+                result += "(" + params[0].axisValue.replace(/\.\d{5,}/, '') + ")";
                 return result;
             }
         },
@@ -44,7 +44,7 @@
             type: 'category',
             axisLabel: {
                 formatter: function (params) {
-                    return params.replace(/\.\d{5,}/,'');
+                    return params.replace(/\.\d{5,}/, '');
                 }
             },
             data: []
@@ -81,7 +81,7 @@
                         option.legend.data.push(tmp);
                     }
                     let c = map[key];
-                    if (i % 2 === 0) {
+                    if (c === 0) {
                         option.xAxis.data.push(chart_values[i]['date']);
                     }
                     option.series[c].data.push(chart_values[i]['value']);
